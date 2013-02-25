@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-import sys, os
 
 version = '0.1'
 
@@ -8,7 +7,7 @@ setup(name='imporganizer',
       description="Organize your imports according to PEP8",
       long_description="""\
 """,
-      classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+      classifiers=[],  # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
       keywords='',
       author='Kevin J. Qiu',
       author_email='kevin.jing.qiu@gmail.com',
@@ -20,7 +19,8 @@ setup(name='imporganizer',
       install_requires=[
           # -*- Extra requirements: -*-
       ],
-      entry_points="""
-      # -*- Entry points: -*-
-      """,
-      )
+      entry_points={
+          'console_scripts': [
+              'organize_import=imporganizer.cli:main',
+          ]
+      })
