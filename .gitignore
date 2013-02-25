@@ -1,0 +1,17 @@
+*.swp
+*.pyc
+*.egg-info
+*.db
+xunit.xml
+.coverage
+coverage.xml
+integration/config.ini
+.noseids
+migrations/liquibase.properties
+logging.ini
+doc/fontconfig
+doc/generated
+.ropeproject/
+build/
+env/
+tags
