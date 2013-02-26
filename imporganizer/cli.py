@@ -4,15 +4,20 @@ import ast
 from collections import namedtuple
 
 
+Name = namedtuple(
+    'Name',
+    ['name', 'asname'],
+)
+
 Import = namedtuple(
     'Import',
-    ['name', 'asname'],
+    ['node', 'names'],
 )
 
 
 ImportFrom = namedtuple(
     'ImportFrom',
-    ['module', 'names', 'level'],
+    ['node', 'module', 'names', 'level'],
 )
 
 
@@ -26,18 +31,22 @@ class MyVisitor(ast.NodeVisitor):
 
     def visit_Import(self, node):
         if self.is_top_level_node(node):
-            self.imports.extend(
-                [Import(n.name, n.asname)
-                 for n in node.names]
-            )
+            self.imports.append(
+                Import(
+                    node=node,
+                    names=[
+                        Name(n.name, n.asname)
+                        for n in node.names
+                    ]))
 
     def visit_ImportFrom(self, node):
         if self.is_top_level_node(node):
             self.imports.append(
                 ImportFrom(
+                    node=node,
                     module=node.module,
                     names=[
-                        Import(
+                        Name(
                             name=name.name,
                             asname=name.asname)
                         for name in node.names
@@ -45,6 +54,12 @@ class MyVisitor(ast.NodeVisitor):
                     level=node.level,
                 )
             )
+
+
+def collect_imports(root_node):
+    visitor = MyVisitor(root_node)
+    visitor.visit(root_node)
+    return visitor.imports
 
 
 def main():
@@ -57,6 +72,4 @@ def main():
     with open(target_file) as f:
         root_node = ast.parse(f.read())
 
-    visitor = MyVisitor(root_node)
-    visitor.visit(root_node)
-    print visitor.imports
+    print collect_imports(root_node)
