@@ -22,7 +22,10 @@ def main():
     resource = File(project, target_file)
     changeset = import_organizer.organize_imports(resource)
 
-    if args.dry_run:
-        print changeset.get_description()
+    if changeset is not None:
+        if args.dry_run:
+            print changeset.get_description()
+        else:
+            project.do(changeset)
     else:
-        project.do(changeset)
+        print 'No changes'
