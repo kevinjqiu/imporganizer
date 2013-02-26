@@ -56,10 +56,26 @@ class MyVisitor(ast.NodeVisitor):
             )
 
 
-def collect_imports(root_node):
-    visitor = MyVisitor(root_node)
-    visitor.visit(root_node)
-    return visitor.imports
+class ImportOrganizer(object):
+    def __init__(self, stream):
+        self.stream = stream
+        self.root_node = ast.parse(self.stream.read())
+
+    def _collect_imports(self, visitor):
+        visitor.visit(self.root_node)
+        return visitor.imports
+
+    def _remove_nodes_from_root(self, nodes):
+        for node in nodes:
+            self.root_node.body.remove(node)
+
+    def __call__(self):
+        visitor = MyVisitor(self.root_node)
+        imports = self._collect_imports(visitor)
+        self._remove_nodes_from_root(
+            [import_.node for import_ in imports])
+
+        print ast.dump(self.root_node)
 
 
 def main():
@@ -70,6 +86,4 @@ def main():
     target_file = args.target
 
     with open(target_file) as f:
-        root_node = ast.parse(f.read())
-
-    print collect_imports(root_node)
+        ImportOrganizer(f)()
