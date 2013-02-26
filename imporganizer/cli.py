@@ -24,10 +24,6 @@ class MyVisitor(ast.NodeVisitor):
     def is_top_level_node(self, node):
         return node in self.root_node.body
 
-    def _import_visitor(self, node):
-        if self.is_top_level_node(node):
-            self.imports.append(node)
-
     def visit_Import(self, node):
         if self.is_top_level_node(node):
             self.imports.extend(
