@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 
 from rope.base.project import Project
 from rope.base.resources import File
@@ -16,6 +17,10 @@ def main():
     args = parser.parse_args()
 
     target_file = args.target
+
+    if not os.path.exists(target_file):
+        print >> sys.stderr, "Target file doesn't exist"
+        sys.exit(1)
 
     project = Project(os.getcwd())
     import_organizer = ImportOrganizer(project)
