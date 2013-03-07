@@ -3,9 +3,56 @@ import os
 import sys
 
 from rope.base.project import Project
+from rope.base.change import ChangeSet
 from rope.base.resources import File
 from rope.refactor.importutils import ImportOrganizer
 from rope.refactor.wrap_line import WrapLine
+
+
+class Agent(object):
+    def __init__(self, target_file, dry_run):
+        self.project = Project(os.getcwd())
+        self.target_file = target_file
+        self.dry_run = dry_run
+        self.commands = []
+
+    @property
+    def resource(self):
+        return File(self.project, self.target_file)
+
+    def add_command_class(self, command_class):
+        self.commands.append(command_class)
+
+    def do(self):
+        commands = [
+            command_class(self.project, self.target_file, self.dry_run)
+            for command_class in self.commands
+        ]
+        changesets = [
+            command.get_changeset()
+            for command in commands
+        ]
+
+        # merge changesets
+        def merge_changesets(aggregated_changeset, next_changeset):
+            for change in next_changeset.changes:
+                aggregated_changeset.add_change(change)
+            aggregated_changeset.description += next_changeset.description
+            return aggregated_changeset
+
+        new_changeset = reduce(
+            merge_changesets,
+            changesets,
+            ChangeSet('')
+        )
+
+        if not new_changeset.changes:
+            return
+
+        if self.dry_run:
+            print new_changeset.get_description()
+        else:
+            self.project.do(new_changeset)
 
 
 class Command(object):
@@ -55,6 +102,8 @@ def main():
     if not os.path.exists(target_file):
         print >> sys.stderr, "Target file doesn't exist"
         sys.exit(1)
-    project = Project(os.getcwd())
-    OrganizeImportCommand(project, target_file, args.dry_run)()
-    WrapLineCommand(project, target_file, args.dry_run)()
+
+    agent = Agent(target_file, args.dry_run)
+    agent.add_command_class(OrganizeImportCommand)
+    agent.add_command_class(WrapLineCommand)
+    agent.do()
