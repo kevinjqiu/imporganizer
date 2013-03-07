@@ -1,1 +1,1 @@
--e hg+https://kevinjqiu@bitbucket.org/kevinjqiu/rope#egg=rope
+-e git+https://github.com/kevinjqiu/rope.git#egg=rope
