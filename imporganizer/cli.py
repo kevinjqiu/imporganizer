@@ -28,10 +28,13 @@ class Agent(object):
             command_class(self.project, self.target_file, self.dry_run)
             for command_class in self.commands
         ]
-        changesets = [
-            command.get_changeset()
-            for command in commands
-        ]
+        changesets = filter(
+            lambda x: x is not None,
+            [
+                command.get_changeset()
+                for command in commands
+            ]
+        )
 
         # merge changesets
         def merge_changesets(aggregated_changeset, next_changeset):
