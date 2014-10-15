@@ -1,1 +1,1 @@
--e git+https://github.com/kevinjqiu/rope.git#egg=rope
+-e git+https://github.com/kevinjqiu/rope.git@line-wrap-organize#egg=rope
